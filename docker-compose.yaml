@@ -1,22 +1,73 @@
-version: '3' 
+version: '3.9'
+
 services:
-  web:
+  nginx:
     image: nginx:latest
+    container_name: nginx
     ports:
-      - "8080:80"
+      - "8080:8080"
     volumes:
-      - ./inside/nginx:/usr/share/nginx/html 
+      - ./nginx:/etc/nginx/conf.d
+      - ./django:/var/www/django
+      - ./react:/var/www/react
+    depends_on:
+      - django
+      - react
+      - api
 
   db:
     image: mariadb
+    container_name: mariadb
     restart: always
     environment:
       MARIADB_ROOT_PASSWORD: walid_password
-  
+      MARIADB_DATABASE: mydatabase
+      MARIADB_USER: walid_user
+      MARIADB_PASSWORD: walid_password
+    ports:
+      - "3306:3306"
+
   phpmyadmin:
     image: phpmyadmin
+    container_name: phpmyadmin
     restart: always
-    ports:
-      - "8081:80"
     environment:
-      - PMA_ARBITRARY=1
+      PMA_HOST: db
+      PMA_USER: walid_user
+      PMA_PASSWORD: walid_password
+    ports:
+      - "8000:8000"
+
+  django:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: django
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8001:8001"
+    depends_on:
+      - db
+
+  react:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: react
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "3000:3000"
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: api
+    volumes:
+      - ./api:/app
+    ports:
+      - "8002:8002"
+    depends_on:
+      - db
