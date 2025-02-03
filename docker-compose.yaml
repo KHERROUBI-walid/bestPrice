@@ -1,73 +1,83 @@
 version: '3.9'
 
 services:
-  nginx:
+  web:
     image: nginx:latest
-    container_name: nginx
     ports:
-      - "8080:8080"
-    volumes:
-      - ./nginx:/etc/nginx/conf.d
-      - ./django:/var/www/django
-      - ./react:/var/www/react
+      - "8080:80"
     depends_on:
-      - django
-      - react
+      - frontend
+      - backend
       - api
+    volumes:
+      - ./nginx:/usr/share/nginx/html
 
   db:
     image: mariadb
-    container_name: mariadb
     restart: always
     environment:
-      MARIADB_ROOT_PASSWORD: walid_password
-      MARIADB_DATABASE: mydatabase
-      MARIADB_USER: walid_user
-      MARIADB_PASSWORD: walid_password
-    ports:
-      - "3306:3306"
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${MARIADB_DATABASE}
+      MARIADB_USER: ${MARIADB_USER}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+      
+    volumes:
+      - db_data:/var/lib/mysql
 
-  phpmyadmin:
-    image: phpmyadmin
-    container_name: phpmyadmin
-    restart: always
-    environment:
-      PMA_HOST: db
-      PMA_USER: walid_user
-      PMA_PASSWORD: walid_password
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: react_frontend
+    volumes:
+      - ./frontend/my_react_app:/app
     ports:
-      - "8000:8000"
+      - "3000:3000"
+    depends_on:
+      - backend
+      - api
 
-  django:
+  backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: django
+    container_name: django_backend
     volumes:
       - ./backend:/app
     ports:
       - "8001:8001"
+    environment:
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - DJANGO_DEBUG=${DJANGO_DEBUG}
+      - DJANGO_ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS}
     depends_on:
       - db
-
-  react:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: react
-    volumes:
-      - ./frontend:/app
-    ports:
-      - "3000:3000"
 
   api:
     build:
       context: ./api
       dockerfile: Dockerfile
-    container_name: api
+    container_name: django_api
     volumes:
       - ./api:/app
     ports:
       - "8002:8002"
+    environment:
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - DJANGO_DEBUG=${DJANGO_DEBUG}
+      - DJANGO_ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS}
     depends_on:
       - db
+
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    ports:
+      - "8081:80"
+    environment:
+      - PMA_ARBITRARY=1
+    depends_on:
+      - db
+
+volumes:
+  db_data:

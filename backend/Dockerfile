@@ -1,7 +1,11 @@
-FROM python:latest
+FROM python:3.13
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
-EXPOSE 8001
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8001"]
+ 
+# Expose the Django port
+EXPOSE 8000
+ 
+# Run Django’s development server
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
