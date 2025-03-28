@@ -1,3 +1,4 @@
-django
-djangorestframework
-mysqlclient
+fastapi
+uvicorn
+sqlalchemy
+mysql-connector-python

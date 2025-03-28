@@ -1,20 +1,13 @@
-# Utiliser la version LTS de Node.js
-FROM node:18-alpine
+FROM node:21.7.1
 
-# Définir le répertoire de travail
 WORKDIR /app
 
-# Copier uniquement les fichiers package.json pour éviter de réinstaller les dépendances à chaque modification du code
-COPY ./my_react_app/package*.json ./
+COPY . .
 
-# Installer les dépendances
 RUN npm install
+RUN npm run build
 
-# Copier tout le projet React dans le conteneur
-COPY ./my_react_app .
+RUN npm install -g serve
 
-# Exposer le port utilisé par React
-EXPOSE 3000
-
-# Démarrer l'application React
-CMD ["npm", "start"]
+EXPOSE 5173
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "5173", "--reload"]
