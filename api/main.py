@@ -8,7 +8,8 @@ from sqlalchemy import func
 
 
 # Configuration de la base de données MySQL
-DATABASE_URL = "mysql+pymysql://root:@localhost/ebay_db"  # Remplace 'yourpassword' par ton mot de passe MySQL
+DATABASE_URL="mysql+mysqlconnector://root:root@db:3306/mydatabase"
+
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
@@ -80,7 +81,7 @@ def get_top_3_products():
             db.query(Product, func.sum(Sale.quantity).label("total_sales"))
             .join(Sale, Product.id == Sale.product_id)
             .group_by(Product.id)
-            .order_by(func.sum(Sale.quantity).desc())  # Trie par nombre total de ventes
+            .order_by(func.sum(Sale.quantity).desc())  
             .limit(3)  # Limiter aux 3 premiers produits
             .all()
         )

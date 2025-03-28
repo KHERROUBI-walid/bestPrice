@@ -53,6 +53,21 @@ const ProductImage = styled.img`
   margin-bottom: 10px;
 `;
 
+const ProductButton = styled.a`
+  display: inline-block;
+  margin-top: 10px;
+  padding: 10px 15px;
+  background-color: #007bff;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #0056b3;
+  }
+`;
+
 const Products = () => {
   const [query, setQuery] = useState("");
   const [products, setProducts] = useState([]);
@@ -140,9 +155,13 @@ const Products = () => {
         {products.length > 0 ? (
           products.map((product) => (
             <ProductCard key={product.id}>
-              <ProductImage src="phone.jpg" alt={product.title} />
+              <ProductImage src={product.image_produit} alt={product.title} />
               <h3>{product.title}</h3>
               <p className="price">${product.price.toFixed(2)}</p>
+              {/* Bouton redirigeant vers eBay */}
+              <ProductButton href={product.url} target="_blank" rel="noopener noreferrer">
+                Voir le produit sur eBay
+              </ProductButton>
             </ProductCard>
           ))
         ) : (
@@ -154,4 +173,3 @@ const Products = () => {
 };
 
 export default Products;
-

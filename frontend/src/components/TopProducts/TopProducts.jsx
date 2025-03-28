@@ -3,7 +3,6 @@ import styled from "styled-components";
 
 const Title = styled.h1`
   margin-top: 70px;
-  
 `;
 
 const ProductList = styled.div`
@@ -23,10 +22,25 @@ const ProductCard = styled.div`
 
 const ProductImage = styled.img`
   width: 100%;
-  height: 200px;
+  height: 300px;
   object-fit: cover;
   border-radius: 10px;
   margin-bottom: 10px;
+`;
+
+const ProductButton = styled.a`
+  display: inline-block;
+  margin-top: 10px;
+  padding: 10px 15px;
+  background-color: #007bff;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  cursor: pointer;
+  
+  &:hover {
+    background-color: #0056b3;
+  }
 `;
 
 const TopProducts = () => {
@@ -37,23 +51,26 @@ const TopProducts = () => {
     fetch("http://localhost:8000/top3-products")
       .then((response) => response.json())
       .then((data) => setTopProducts(data))
-      .catch((error) => console.error("Error fetching top 3 products:", error));
+      .catch((error) => console.error("Erreur lors de la récupération des top 3 produits:", error));
   }, []);
 
   return (
     <div>
       <Title>
-        <h1>Welcome</h1>
-        <h2>Top 3 products</h2>
+        <h1>Bienvenue</h1>
+        <h2>Top 3 produits</h2>
       </Title>
 
       <ProductList>
         {topProducts.map((product) => (
           <ProductCard key={product.id}>
-            <ProductImage src="phone.jpg" alt={product.title} />
+            <ProductImage src={product.image_produit} alt={product.title} />
             <h3>{product.title}</h3>
             <p className="price">${product.price.toFixed(2)}</p>
             <p>Total des ventes: {product.total_sales}</p>
+            <ProductButton href={product.url} target="_blank" rel="noopener noreferrer">
+              Voir le produit
+            </ProductButton>
           </ProductCard>
         ))}
       </ProductList>
