@@ -61,7 +61,7 @@ services:
       - db_data:/var/lib/mysql
     networks:
       - apiNetwork
-    healthcheck:  # Healthcheck pour vérifier l'état de MySQL
+    healthcheck: 
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
       timeout: 5s
